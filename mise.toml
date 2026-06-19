@@ -1,0 +1,10 @@
+[tools]
+poetry = "latest"
+python = "3.14"
+
+[tasks.setup]
+description = "Configura o ambiente de desenvolvimento (instala dependências e hooks do git)"
+run = """
+poetry install
+poetry run pre-commit install
+"""

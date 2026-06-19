@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup mise (install tools from mise.toml)
+        uses: jdx/mise-action@v2
+        with:
+          install: true
+
+      - name: Cache pip and poetry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.cache/pypoetry
+            ~/.cache/pypoetry/cache
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock', '**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Install dependencies (Poetry)
+        run: poetry install --no-interaction
+
+      - name: Run type checks (mypy)
+        run: poetry run mypy src
+
+      - name: Run linter (pylint)
+        run: poetry run pylint src
+
+      - name: Check formatting (black)
+        run: poetry run black --check .
+
+      - name: Run tests
+        run: poetry run pytest -q
