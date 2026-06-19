@@ -1,0 +1,10 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ..:/app:cached
+    command: poetry run python src/main.py
+    environment:
+      - PYTHONUNBUFFERED=1
